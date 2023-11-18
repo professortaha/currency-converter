@@ -4,7 +4,7 @@ def convert ():
         init_currency = input ("enter the currency you have: ")
         dist_currency = input ("enter the currency you want: ")
         amount = float(input("enter the amount in numbers: "))
-        url = "https://api.apilayer.com/fixer/convert?to="+init_currency+"&from="+dist_currency+"&amount="+str(amount)
+        url = "https://api.apilayer.com/fixer/convert?to="+dist_currency+"&from="+init_currency+"&amount="+str(amount)
 
         payload = {}
         headers= {

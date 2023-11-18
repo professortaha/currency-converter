@@ -1,6 +1,5 @@
 import requests
 
-
 def convert ():
         init_currency = input ("enter the currency you have: ")
         dist_currency = input ("enter the currency you want: ")
@@ -36,12 +35,15 @@ def get_all_currencies ():
         print(result)
         
         convert()
-    
-start = input ("enter the START to start the app or enter ALL (in uppercase) to see list of currencies or enter END (in uppercase) to exit the app: ")
 
-if start.upper() == "ALL":
-    convert = get_all_currencies()
-elif start.upper() == "END":
-    exit()
-else:
-    convert = convert()
+while True:
+    start = input("Enter 'START' to start the app, 'ALL' to see the list of currencies, or 'END' to exit the app: ")
+
+    if start.upper() == "ALL":
+        get_all_currencies()
+    elif start.upper() == "END":
+        break  # Exit the loop and end the app
+    elif start.upper() == "START":
+        convert()
+    else:
+        print("Invalid input. Please enter 'START', 'ALL', or 'END.")

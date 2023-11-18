@@ -1,75 +1,48 @@
 import requests
 
-def get_available_currencies():
-    api_key = "zF5VgnWtLBc96rb5sgGwC95PMh7MhGRk"
-    url = f"https://api.apilayer.com/fixer/symbols"
+API_KEY = "zF5VgnWtLBc96rb5sgGwC95PMh7MhGRk"
+
+def make_api_request(url, headers, payload=None):
+    response = requests.get(url, headers=headers, data=payload)
+    response.raise_for_status()  # Raise an exception for bad responses
+    return response
+
+def convert(api_key):
+    init_currency = input("Enter the currency you have: ")
+    dist_currency = input("Enter the currency you want: ")
+    amount = float(input("Enter the amount in numbers: "))
+    url = f"https://api.apilayer.com/fixer/convert?to={dist_currency}&from={init_currency}&amount={amount}"
+
+    headers = {"apikey": api_key}
 
     try:
-        headers = {"apikey": api_key}
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
+        response = make_api_request(url, headers)
         result = response.json()
-
-        if result.get('symbols'):
-            return result['symbols']
-        else:
-            print(f"Error: {result.get('error', {}).get('info', 'Unknown error')}")
-            return None
-
+        converted_amount = result['result']
+        print(f'{amount} {init_currency} = {converted_amount} {dist_currency}')
     except requests.exceptions.RequestException as e:
-        print(f"Request Error: {e}")
-        return None
+        print(f"Error: {e}")
 
-def convert_currency(init_currency, dist_currency, amount):
-    api_key = "zF5VgnWtLBc96rb5sgGwC95PMh7MhGRk"
-    url = f"https://api.apilayer.com/fixer/convert?to={init_currency}&from={dist_currency}&amount={amount}"
+def get_all_currencies(api_key):
+    url = "https://api.apilayer.com/fixer/symbols"
+    headers = {"apikey": api_key}
 
     try:
-        headers = {"apikey": api_key}
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        result = response.json()
-        
-        if result.get('result'):
-            converted_amount = result['result']
-            return converted_amount
-        else:
-            print(f"Error: {result.get('error', {}).get('info', 'Unknown error')}")
-            return None
-
+        response = make_api_request(url, headers)
+        result = response.text
+        print(result)
+        convert(api_key)
     except requests.exceptions.RequestException as e:
-        print(f"Request Error: {e}")
-        return None
+        print(f"Error: {e}")
 
-if __name__ == "__main__":
-    available_currencies = get_available_currencies()
+while True:
+    start = input("Enter 'START' to start the app, 'ALL' to see the list of currencies, or 'END' to exit the app: ")
 
-    if available_currencies:
-        print("Available Currencies:")
-        for currency, details in available_currencies.items():
-            print(f"{currency}: {details['description']}")
-
-        user_choice = input("Enter the currency you have or type 'all' to see all currencies: ").upper()
-
-        if user_choice.upper() == 'ALL':
-            for currency, details in available_currencies.items():
-                print(f"{currency}: {details['description']}")
-        elif user_choice in available_currencies:
-            init_currency = user_choice
-            dist_currency = input("Enter the currency you want: ").upper()
-
-            try:
-                amount = float(input("Enter the amount in numbers: "))
-            except ValueError:
-                print("Invalid input. Please enter a valid numeric amount.")
-                exit()
-
-            converted_amount = convert_currency(init_currency, dist_currency, amount)
-
-            if converted_amount is not None:
-                print(f"{amount} {init_currency} = {converted_amount} {dist_currency}")
-        else:
-            print("Invalid currency code. Please enter a valid currency code or 'all'.")
-
+    if start.upper() == "ALL":
+        get_all_currencies(API_KEY)
+    elif start.upper() == "END":
+        break  # Exit the loop and end the app
+    elif start.upper() == "START":
+        convert(API_KEY)
     else:
-        print("Failed to fetch available currencies. Exiting.")
+        print("Invalid input. Please enter 'START', 'ALL', or 'END.")
